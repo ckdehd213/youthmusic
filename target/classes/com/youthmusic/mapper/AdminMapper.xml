@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.youthmusic.mapper.AdminMapper">
+
+	<select id="adminLogin" resultType="com.youthmusic.domain.AdminVO">
+	
+	SELECT 
+		ad_id, 
+		ad_pw, 
+		ad_name, 
+		ad_lastlogin 
+	FROM 
+		admin_tbl 
+	WHERE 
+		ad_id = #{ad_id}
+	
+	</select>
+	
+	<insert id="adminRegister">
+	
+	INSERT INTO admin_tbl(
+		ad_id, 
+		ad_pw, 
+		ad_name
+	)
+	VALUES(
+	#{ad_id}, 
+		#{ad_pw}, 
+		'관리자'
+	)
+	
+	</insert>
+</mapper>

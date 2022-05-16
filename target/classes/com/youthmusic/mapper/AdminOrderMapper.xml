@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.youthmusic.mapper.AdminOrderMapper">
+
+	<!-- 일반주문목록 -->
+	<select id="getListWithPaging" resultType="com.youthmusic.domain.OrderVO">
+	
+		<![CDATA[ 
+		SELECT 
+			ord_num, 
+        	mem_id, 
+        	ord_name, 
+        	ord_post, 
+        	ord_addr, 
+        	ord_addr2, 
+        	ord_phone, 
+        	ord_total_price, 
+        	ord_date, 
+        	ord_message, 
+        	ord_state, 
+        	ord_depositor
+			
+		FROM (
+		        SELECT 
+		        	/*+ index_desc(order_tbl order_tbl_pk) */ 
+		        	rownum rn,
+		        	ord_num, 
+		        	mem_id, 
+		        	ord_name, 
+		        	ord_post, 
+		        	ord_addr, 
+		        	ord_addr2, 
+		        	ord_phone, 
+		        	ord_total_price, 
+		        	ord_date, 
+		        	ord_message, 
+		        	ord_state, 
+		        	ord_depositor
+				FROM 
+					order_tbl
+				WHERE 
+		]]>     
+		
+		<!-- 날짜검색 -->
+		<include refid="period"></include>
+		<!-- 조건검색 -->
+		<include refid="criteria"></include>
+		
+		<![CDATA[     
+				    rownum <= (#{cri.pageNum} * #{cri.amount}) 
+				)
+		
+		WHERE 
+			rn > ((#{cri.pageNum} - 1) * #{cri.amount} )
+		]]>
+	
+	</select>
+
+	<select id="getTotalCount" resultType="int">
+		SELECT 
+			count(*) 
+		FROM 
+			order_tbl 
+		WHERE
+		
+		<!-- 날짜검색 -->
+		<include refid="period"></include>
+		<!-- 조건검색 -->
+		<include refid="criteria"></include> 
+		
+		ord_num > 0
+		
+	</select>
+	
+	<sql id="period">
+		
+		<if test="startDate != null and !startDate.equals('') and endDate != null and !endDate.equals('')">
+			<![CDATA[
+		
+				ord_date >= to_date(#{startDate}, 'YYYY-MM-DD')
+			AND
+				ord_date < to_date(#{endDate}, 'YYYY-MM-DD') + 1
+			AND
+				
+			]]>
+		</if>
+	</sql>
+	
+	<sql id="criteria">
+		<trim prefix="(" suffix=") AND " prefixOverrides="OR">
+			<foreach item="type" collection="cri.typeArr">
+				<trim prefix="OR">
+					<choose>
+						<when test="type == 'N'.toString()">
+							ord_name like '%' || #{cri.keyword} || '%'
+						</when>
+						<when test="type == 'C'.toString()">
+							ord_num like '%' || #{cri.keyword} || '%'
+						</when>
+					</choose>
+				</trim>
+			</foreach>
+		</trim> 
+	</sql>
+	
+
+	<!-- 주문상태별 주문목록 -->
+	
+	<select id="getOrderStateListWithPaging" resultType="com.youthmusic.domain.OrderVO">
+	
+		<![CDATA[ 
+		SELECT 
+			ord_num, 
+        	mem_id, 
+        	ord_name, 
+        	ord_post, 
+        	ord_addr, 
+        	ord_addr2, 
+        	ord_phone, 
+        	ord_total_price, 
+        	ord_date, 
+        	ord_message, 
+        	ord_state, 
+        	ord_depositor
+			
+		FROM (
+		        SELECT 
+		        	/*+ index_desc(order_tbl order_tbl_pk) */ 
+		        	rownum rn,
+		        	ord_num, 
+		        	mem_id, 
+		        	ord_name, 
+		        	ord_post, 
+		        	ord_addr, 
+		        	ord_addr2, 
+		        	ord_phone, 
+		        	ord_total_price, 
+		        	ord_date, 
+		        	ord_message, 
+		        	ord_state, 
+		        	ord_depositor
+				FROM 
+					order_tbl
+				WHERE 
+					ord_state = #{ord_state}
+				AND
+		]]>     
+		    
+		<include refid="ordStateCriteria"></include>
+		
+		<![CDATA[     
+				    rownum <= (#{cri.pageNum} * #{cri.amount}) 
+				)
+		
+		WHERE 
+			rn > ((#{cri.pageNum} - 1) * #{cri.amount} )
+		]]>
+	
+	</select>
+	
+	<!-- 주문진행상태 건수 -->
+	<select id="getOrderStateCount" resultType="int">
+	
+		SELECT
+			count(*)
+		FROM
+			order_tbl
+		WHERE
+			ord_state = #{ord_state}
+	
+	</select>
+	
+	<select id="getOrderStateTotalCount" resultType="int">
+		SELECT 
+			count(*) 
+		FROM 
+			order_tbl 
+		WHERE
+			ord_state = #{ord_state}
+		AND
+			
+		<include refid="ordStateCriteria"></include> 
+		
+		ord_num > 0
+		
+	</select>
+	
+	<sql id="ordStateCriteria">
+		<trim prefix="(" suffix=") AND " prefixOverrides="OR">
+			<foreach item="type" collection="cri.typeArr">
+				<trim prefix="OR">
+					<choose>
+						<when test="type == 'N'.toString()">
+							ord_name like '%' || #{cri.keyword} || '%'
+						</when>
+						<when test="type == 'C'.toString()">
+							ord_num like '%' || #{cri.keyword} || '%'
+						</when>
+					</choose>
+				</trim>
+			</foreach>
+		</trim> 
+	</sql>
+	
+	<update id="orderStateChange">
+	
+		UPDATE
+			order_tbl
+		SET
+			ord_state = #{ord_state}
+		WHERE
+			ord_num = #{ord_num}
+			
+	</update>
+	
+	<delete id="ordDelete">
+	
+		DELETE FROM
+			order_tbl
+		WHERE
+			ord_num = #{ord_num}
+	
+	</delete>
+	
+	<delete id="ordDetailDelete">
+	
+		DELETE FROM
+			order_dt_tbl
+		WHERE
+			ord_num = #{ord_num}
+	
+	</delete>
+	
+	
+	
+	<select id="ordDetailInfo" resultType="com.youthmusic.domain.OrderDetailInfo">	
+	
+		SELECT
+			 od.ord_num, 
+			 od.pro_num, 
+			 p.pro_name, 
+			 od.ord_amount, 
+			 od.ord_price, 
+			 p.pro_uploadpath, 
+			 p.pro_img
+		FROM
+			ord_dt_tbl od
+		INNER JOIN
+			product_tbl p
+		ON
+			od.pro_num = p.pro_num
+		WHERE
+			od.ord_num = #{ord_num}	
+					
+	</select>
+	
+	<delete id="ordDetailListDelete">
+	
+		DELETE FROM
+			ord_dt_tbl
+		WHERE
+			ord_num = #{ord_num}
+		AND
+			pro_num = #{pro_num}
+	
+	</delete>
+
+</mapper>

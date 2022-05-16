@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.youthmusic.mapper.CartMapper">
+
+	<insert id="cartAdd">
+	
+		MERGE INTO
+			cart_tbl c
+		USING
+			dual
+		ON
+			(c.mem_id = #{mem_id} and c.pro_num = #{pro_num})
+		WHEN MATCHED THEN
+			UPDATE
+			SET
+				c.cart_amount = c.cart_amount + #{cart_amount}	
+		WHEN NOT MATCHED THEN				
+			INSERT
+				(
+					cart_code,
+					pro_num,
+					mem_id,
+					cart_amount
+				)
+			VALUES
+				(
+					seq_cart_code.nextval,
+					#{pro_num},
+					#{mem_id},
+					#{cart_amount}
+				)	
+				
+	</insert>
+	
+	<select id="cartList" resultType="com.youthmusic.domain.CartListVO">
+	
+		SELECT
+			c.cart_code,
+			c.pro_num,
+			c.mem_id,
+			c.cart_amount,
+			p.pro_name,
+			p.pro_price, 
+    		p.pro_discount,  
+    		p.pro_img, 
+    		p.pro_uploadpath
+		FROM
+			cart_tbl c INNER JOIN product_tbl p
+		ON
+			c.pro_num = p.pro_num
+		WHERE
+			c.mem_id = #{mem_id}
+	
+	</select>
+	
+	<delete id="cartDel">
+	
+		DELETE FROM
+			cart_tbl
+		WHERE
+			cart_code = #{cart_code}	
+	
+	</delete>
+
+
+	<delete id="cartAllDel">
+	
+		DELETE FROM
+			cart_tbl
+		WHERE
+			mem_id = #{mem_id}	
+	
+	</delete>
+
+</mapper>

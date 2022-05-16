@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.youthmusic.mapper.MemberMapper">
+
+	<insert id="join" parameterType="com.youthmusic.domain.MemberVO">
+	
+		INSERT INTO mem_tbl(
+			mem_id,
+			mem_pw,
+			mem_name,
+			mem_email,
+			mem_post,
+			mem_addr,
+			mem_addr2, 
+			mem_phone,
+			mem_echk
+		    )
+		VALUES(
+			#{mem_id}, 
+			#{mem_pw}, 
+			#{mem_name}, 
+			#{mem_email}, 
+			#{mem_post}, 
+			#{mem_addr}, 
+			#{mem_addr2}, 
+			#{mem_phone}, 
+			#{mem_echk} 
+		)    
+	
+	</insert>
+	
+	<select id="checkID" resultType="string">
+	
+		SELECT
+			mem_id
+		FROM
+			mem_tbl
+		WHERE
+			mem_id = #{mem_id}		
+	
+	</select>
+	
+	<select id="login" resultType="com.youthmusic.domain.MemberVO">
+	
+		SELECT
+			mem_id, mem_pw, mem_name, mem_email, mem_post, mem_addr, mem_addr2, mem_phone, mem_echk, mem_point, mem_credate, mem_update, mem_lastlogin
+		FROM
+			mem_tbl
+		WHERE
+			mem_id = #{mem_id}	
+	
+	</select>
+	
+	<select id="searchPwByEmail" resultType="string">
+	
+		SELECT
+			mem_email
+		FROM
+			mem_tbl
+		WHERE
+			mem_email = #{mem_email}
+	
+	</select>
+	
+	<update id="changePw">
+	
+		UPDATE
+			mem_tbl
+		SET
+			mem_pw = #{mem_pw}	
+		WHERE
+			mem_email = #{mem_email}
+		
+	
+	</update>
+	
+	<select id="currentPw" resultType="String">
+	
+		SELECT
+			mem_pw
+		FROM
+			mem_tbl
+		WHERE
+			mem_id = #{mem_id}
+	
+	</select>
+	
+	<update id="changeNewPw">
+	
+		UPDATE
+			mem_tbl
+		SET
+			mem_pw = #{changed_mem_pw}
+		WHERE
+			mem_id = #{mem_id}
+	
+	</update>
+	
+	<update id="edit" >
+	
+		UPDATE
+			mem_tbl
+		SET
+			mem_email = #{mem_email},
+			mem_post = #{mem_post},
+			mem_addr = #{mem_addr},
+			mem_addr2 = #{mem_addr2}, 
+			mem_phone = #{mem_phone},
+			mem_echk = #{mem_echk},
+			mem_update = sysdate
+		WHERE
+			mem_id = #{mem_id}
+		
+	</update>
+	
+	<delete id="memDelete">
+	
+		DELETE FROM
+			mem_tbl
+		WHERE
+			mem_id = #{mem_id}
+	
+	</delete>
+	
+</mapper>

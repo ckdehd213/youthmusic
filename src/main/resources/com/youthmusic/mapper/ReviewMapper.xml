@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.youthmusic.mapper.ReviewMapper">
+
+	<select id="reviewListWithPaging" resultType="com.youthmusic.domain.ReviewVO">
+	
+		<![CDATA[ 
+		SELECT 
+			rev_num, 
+		    mem_id, 
+		    pro_num, 
+		    rev_content, 
+		    rev_score, 
+		    rev_regdate 
+			
+		FROM (
+		        SELECT 
+		        	/*+ index_desc(review_tbl review_tbl_pk) */ 
+		        	rownum rn, 
+		        	rev_num, 
+		        	mem_id, 
+		        	pro_num, 
+		        	rev_content, 
+		        	rev_score, 
+		        	rev_regdate
+				FROM 
+					review_tbl
+				WHERE 
+					pro_num = #{pro_num}
+					AND
+				    rownum <= (#{cri.pageNum} * #{cri.amount}) 
+				)
+		
+		WHERE 
+			rn > ((#{cri.pageNum} - 1) * #{cri.amount} )
+		]]>
+	
+	</select>
+	
+	<select id="getTotalCount" resultType="int">
+		
+		SELECT 
+			count(*) 
+		FROM 
+			review_tbl 
+		WHERE
+			pro_num = #{pro_num}
+	
+	</select>
+	
+	<insert id="reviewInsert">
+	
+		INSERT INTO 
+			review_tbl
+			(
+				rev_num, 
+			    mem_id, 
+			    pro_num, 
+			    rev_content, 
+			    rev_score
+		    )
+		VALUES
+			(	
+				SEQ_REVIEW_NUM.NEXTVAL,
+			  	#{mem_id}, 
+			  	#{pro_num}, 
+			  	#{rev_content}, 
+			  	#{rev_score}
+			)	    
+	
+	</insert>
+	
+	<update id="reviewEdit">
+	
+		UPDATE
+			review_tbl
+		SET
+			rev_content = #{rev_content},
+			rev_score = #{rev_score}
+		WHERE
+			rev_num = #{rev_num}
+			
+	</update>
+	
+	<delete id="reviewDel">
+	
+		DELETE FROM
+			review_tbl
+		WHERE
+			rev_num = #{rev_num}
+			
+	</delete>
+
+</mapper>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.youthmusic.mapper.OrderMapper">
+
+	<select id="orderInfo" resultType="com.youthmusic.domain.OrderInfoVO">
+	
+		SELECT
+			p.pro_num,
+			p.pro_name,
+			p.pro_img,
+			p.pro_uploadpath,
+			c.cart_amount,
+			p.pro_price * c.cart_amount as orderprice
+		FROM
+			cart_tbl c inner join product_tbl p
+		ON
+			c.pro_num = p.pro_num
+		AND
+			c.mem_id = #{mem_id}
+			
+	</select>
+	
+	<insert id="orderInsert" parameterType="com.youthmusic.domain.OrderVO">
+		<!-- OrderVO클래스의 ord_num값이 시퀀스로 사용되기 위하여  selectKey 사용 -->
+		<selectKey keyProperty="ord_num" order="BEFORE" resultType="Integer">
+			SELECT 
+				seq_order_num.nextval 
+			FROM 
+				dual
+		</selectKey>
+	
+		INSERT INTO
+			order_tbl
+			(
+				ord_num, 
+				mem_id, 
+				ord_name, 
+				ord_post, 
+				ord_addr, 
+				ord_addr2, 
+				ord_phone, 
+				ord_total_price, 
+				ord_message, 
+				ord_depositor
+			)	
+		VALUES
+			(
+				#{ord_num},
+				#{mem_id},
+				#{ord_name},
+				#{ord_post},
+				#{ord_addr},
+				#{ord_addr2},
+				#{ord_phone},
+				#{ord_total_price},
+				#{ord_message},
+				#{ord_depositor}
+			)
+	</insert>
+	
+	<insert id="orderDetailInsert" parameterType="com.youthmusic.domain.OrderDetail">
+	
+		INSERT INTO
+			ord_dt_tbl
+			(
+				ord_num, 
+				pro_num, 
+				ord_amount, 
+				ord_price
+			)
+		VALUES
+			(
+				#{ord_num},
+				#{pro_num},
+				#{ord_amount},
+				#{ord_price}
+			)
+	
+	</insert>
+
+</mapper>

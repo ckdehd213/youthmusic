@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.youthmusic.mapper.UserProductMapper">
+
+	<select id="mainCategory" resultType="com.youthmusic.domain.CategoryVO">
+	
+		SELECT 
+			cg_code, 
+			cg_prt_code, 
+			cg_name 
+		FROM 
+			category_tbl 
+		WHERE 
+			cg_prt_code IS NULL
+	
+	</select>
+	
+	<select id="subCategory" resultType="com.youthmusic.domain.CategoryVO">
+	
+		SELECT 
+			cg_code, 
+			cg_prt_code, 
+			cg_name 
+		FROM 
+			category_tbl 
+		WHERE 
+			cg_prt_code = #{cg_code}
+	
+	</select>
+	
+	<select id="getListWithPaging" resultType="com.youthmusic.domain.ProductVO">
+		
+		<![CDATA[ 
+		SELECT 
+			pro_num, 
+			cg_prt_code, 
+			cg_code, 
+			pro_name, 
+			pro_price, 
+			pro_discount, 
+			pro_company, 
+			pro_content, 
+			pro_img, 
+			pro_uploadpath,
+			pro_stock, 
+			pro_ok_buy,
+			pro_loaddate, 
+			pro_updatedate
+			
+		FROM (
+		   SELECT
+		    /*+ index_desc(product_tbl product_tbl_pk) */ 
+		    rownum rn, 
+		    pro_num, 
+			cg_prt_code, 
+			cg_code, 
+			pro_name, 
+			pro_price, 
+			pro_discount, 
+			pro_company, 
+			pro_content, 
+			pro_img, 
+			pro_uploadpath,
+			pro_stock, 
+			pro_ok_buy,
+			pro_loaddate, 
+			pro_updatedate
+		    	FROM 
+		    		product_tbl
+		    	WHERE 
+		    		cg_code = #{cg_code}
+		   		AND
+		    		rownum <= (#{cri.pageNum} * #{cri.amount}) 
+		)
+		WHERE 
+			rn > ((#{cri.pageNum} - 1) * #{cri.amount} )
+		]]>
+		
+	</select>
+	
+	<select id="getTotalCount" resultType="int">
+		
+		SELECT 
+			count(*) 
+		FROM 
+			product_tbl 
+		WHERE
+			cg_code = #{cg_code}
+		
+	</select>
+	
+	<select id="productDetail" resultType="com.youthmusic.domain.ProductVO">
+	
+		SELECT
+			pro_num, 
+			cg_prt_code, 
+			cg_code, 
+			pro_name, 
+			pro_price, 
+			pro_discount, 
+			pro_company, 
+			pro_content, 
+			pro_img, 
+			pro_uploadpath,
+			pro_stock, 
+			pro_ok_buy,
+			pro_loaddate, 
+			pro_updatedate
+		FROM
+			product_tbl
+		WHERE
+			pro_num = #{pro_num}
+			
+	</select>
+
+</mapper>

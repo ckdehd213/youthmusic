@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.youthmusic.mapper.ChartMapper">
+
+	<select id="primaryChart" resultType="com.youthmusic.domain.ChartVO">
+	
+		SELECT
+			c.cg_name,
+			sum(od.ord_price * od.ord_amount) as sales
+		FROM
+			product_tbl p, ord_dt_tbl od, category_tbl c
+		WHERE
+			p.pro_num = od.pro_num and p.cg_prt_code = c.cg_code
+		GROUP BY
+			c.cg_name
+		ORDER BY
+			c.cg_name
+	</select>
+
+	<select id="secondaryChart" resultType="com.youthmusic.domain.ChartVO">
+	
+		SELECT
+		
+		FROM
+		
+		INNER JOIN
+			(
+			
+			)
+		ON
+		
+		GROUP BY
+		
+		
+	</select>
+	
+</mapper>
