@@ -20,18 +20,41 @@
 	<select id="secondaryChart" resultType="com.youthmusic.domain.ChartVO">
 	
 		SELECT
-		
+			c.cg_name,
+			sum(sales) sales
 		FROM
-		
+			category_tbl c
 		INNER JOIN
 			(
-			
-			)
+				SELECT
+					p.cg_code,
+					sum(od.ord_price * od.ord_amount) as sales
+				FROM
+					product_tbl p, ord_dt_tbl od
+				WHERE
+					p.pro_num = od.pro_num
+				GROUP BY
+					p.cg_code			
+			) imsi
 		ON
-		
+			c.cg_code = imsi.cg_code
 		GROUP BY
+			c.cg_name
 		
-		
+	</select>
+	
+	<select id="salesByYearChart" resultType="com.youthmusic.domain.ChartVO">
+	
+		SELECT
+			sum(ord_price) totalprice,
+			to_char(ord_date, 'YYYY') year
+		FROM
+			order_tbl
+		GROUP BY
+			to_char(ord_regdate, 'YYYY')
+		ORDER BY
+			to_char(ord_regdate, 'YYYY')
+	
 	</select>
 	
 </mapper>
